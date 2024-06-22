@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">{{ article.title }}</h1>
+<p class="subtitle">{{ article.date }}</p>
+
+{% if not purchase %}
+<div>
+    <p>この記事を読むには購入が必要です。</p>
+    <form action="{{ url_for('main.checkout', article_id=article.id) }}" method="POST">
+        <button class="button is-primary purchase-button">購入する</button>
+    </form>
+</div>
+{% else %}
+<div class="content">
+    <p>{{ article.content }}</p>
+    <small>価格: {{ article.price }}円</small>
+</div>
+{% endif %}
+{% endblock %}
+
+<style>
+    .purchase-button {
+        background-color: #28a745;
+        /* 緑色 */
+        border: none;
+        color: white;
+        width: 100%;
+        box-shadow: none;
+    }
+
+    .purchase-button:hover {
+        background-color: #218838;
+        /* ホバー時の濃い緑色 */
+    }
+</style>

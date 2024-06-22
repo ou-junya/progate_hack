@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>リアPro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.2/css/bulma.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.2);
+            /* Initial transparency */
+            transition: background-color 0.3s;
+            padding: 10px;
+            z-index: 1000;
+        }
+
+        .navbar-menu {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            z-index: 1000;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            height: 100vh;
+        }
+
+        .navbar-burger.is-active+.navbar-menu {
+            display: block;
+        }
+
+        @media (min-width: 1024px) {
+            .navbar-menu {
+                display: flex !important;
+                position: relative;
+                top: auto;
+                left: auto;
+                right: auto;
+                background-color: transparent;
+                box-shadow: none;
+                height: auto;
+            }
+
+            .navbar-burger {
+                display: none;
+                /* Hide burger menu on larger screens */
+            }
+        }
+
+        .navbar-burger {
+            cursor: pointer;
+        }
+
+        .navbar-burger.is-active span {
+            display: none;
+        }
+
+        .navbar-burger.is-active::before {
+            content: '✖';
+            font-size: 1.5em;
+            color: black;
+            display: block;
+            line-height: 1;
+        }
+
+        .navbar-end .navbar-item:hover,
+        .navbar-brand .navbar-item:hover {
+            background-color: rgba(255, 255, 255, 0) !important;
+        }
+
+        .navbar-brand {
+            padding-left: 40px;
+        }
+
+        .navbar-end {
+            padding-right: 20px;
+        }
+
+        .hero-body {
+            padding: 0;
+        }
+
+        .hero.is-primary {
+            background-image: url("/static/images/buildings.jpg");
+            position: relative;
+            display: flex;
+            box-sizing: border-box;
+            width: 100%;
+            min-height: 100vh;
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-color: rgb(255, 255, 255);
+            background-size: cover;
+        }
+        body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Roboto', Arial, sans-serif;
+        background-color: #f5f7fa;
+        position: relative;
+    }
+    #chatContainer {
+        width: 350px;
+        height: 80%;
+        position: fixed;
+        top: 60px; /* メニューバーの高さに応じて調整 */
+        right: 30px;
+        border: none;
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+    }
+    #chatHeader {
+        background-color: #4a90e2;
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        font-size: 18px;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+    }
+    #responses {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .message {
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 80%;
+        line-height: 1.4;
+        font-size: 14px;
+        text-align: left;
+    }
+    .user {
+        align-self: flex-end;
+        background-color: #4a90e2;
+        color: white;
+    }
+    .ai {
+        align-self: flex-start;
+        background-color: #f0f2f5;
+        color: #1c2733;
+    }
+    #inputArea {
+        padding: 15px;
+        border-top: 1px solid #e6e6e6;
+        display: flex;
+        align-items: center;
+    }
+    #userInput {
+        flex-grow: 1;
+        padding: 12px 15px;
+        border: 1px solid #e6e6e6;
+        border-radius: 25px;
+        outline: none;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    #sendButton {
+        padding: 10px 15px;
+        background-color: #4a90e2;
+        border: none;
+        color: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    #sendButton:hover {
+        background-color: #3a7bc8;
+    }
+    #chatBotButton {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #4a90e2;
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+    }
+    #chatBotButton:hover {
+        background-color: #3a7bc8;
+        transform: scale(1.05);
+    }
+    #loadingIndicator {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    </style>
+</head>
+
+<body>
+    <section class="hero is-primary is-fullheight">
+        <div class="hero-head" style="position: fixed;top: 0;width: 100%; z-index: 1000;">
+            <nav class="navbar">
+                <div class="container">
+                    <div class="navbar-brand">
+                        <a class="navbar-item" href="{{ url_for('main.index') }}">
+                            <img src="/static/images/logo_tr_str.png">
+                        </a>
+                        <div class="navbar-burger burger" data-target="navbarMenuHeroA">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                    <div id="navbarMenuHeroA" class="navbar-menu">
+                        <div class="navbar-end">
+                            {% if current_user.is_authenticated %}
+                            <!-- <a href="{{ url_for('main.mypage') }}" class="navbar-item">
+                                Mypage
+                            </a> -->
+                            <a href="{{ url_for('main.create') }}" class="navbar-item">
+                                投稿
+                            </a>
+                            <a href="{{ url_for('main.posted') }}" class="navbar-item">
+                                投稿一覧
+                            </a>
+                            <a href="{{ url_for('main.purchased') }}" class="navbar-item">
+                                購入一覧
+                            </a>
+                            <a href="{{ url_for('auth.logout') }}" class="navbar-item">
+                                Logout
+                            </a>
+                            <p class="navbar-item">Welcome, {{ current_user.username }}</p>
+                            {% else %}
+                            <a href="{{ url_for('auth.login') }}" class="navbar-item">
+                                Login
+                            </a>
+                            <a href="{{ url_for('auth.signup') }}" class="navbar-item">
+                                Sign Up
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </div>
+
+        <div class="hero-body">
+            <div class="container has-text-centered">
+                {% block content %}
+                {% endblock %}
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get all "navbar-burger" elements
+            const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+            // Check if there are any navbar burgers
+            if ($navbarBurgers.length > 0) {
+                // Add a click event on each of them
+                $navbarBurgers.forEach(el => {
+                    el.addEventListener('click', () => {
+                        // Get the target from the "data-target" attribute
+                        const target = el.dataset.target;
+                        const $target = document.getElementById(target);
+
+                        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+                        el.classList.toggle('is-active');
+                        $target.classList.toggle('is-active');
+
+                        // Lock the background scrolling when the menu is open
+                        if (el.classList.contains('is-active')) {
+                            document.body.style.position = 'fixed';
+                            document.body.style.top = `-${window.scrollY}px`;
+                        } else {
+                            const scrollY = document.body.style.top;
+                            document.body.style.position = '';
+                            document.body.style.top = '';
+                            window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $(window).scroll(function () {
+                var scrollTop = $(window).scrollTop();
+                var maxScroll = 500; // Maximum scroll height at which transparency will change
+                var opacity = Math.min(1, scrollTop / maxScroll); // Calculate opacity based on scroll
+                var ratio = 255 - 255 * (opacity);
+                $('.navbar').css('background-color', 'rgba(225, 233, 190, ' + opacity + ')');
+                $('.navbar-item').css('color', 'rgba(' + ratio + ',' + ratio + ' ,' + ratio + ' , 1)');
+            });
+        });
+    </script>
+    <button id="chatBotButton" onclick="toggleChat()">💬</button>
+    <div id="chatContainer">
+        <div id="chatHeader">AIチャットボット</div>
+        <div id="responses"></div>
+        <div id="loadingIndicator">
+            <div class="loader"></div>
+        </div>
+        <div id="inputArea">
+            <input type="text" id="userInput" placeholder="メッセージを入力" onkeypress="handleKeyPress(event)">
+            <button id="sendButton" onclick="sendMessage()">送信</button>
+        </div>
+    </div>
+
+    <script>
+        let isInitialMessage = true;
+
+        function toggleChat() {
+            var chatContainer = document.getElementById('chatContainer');
+            if (chatContainer.style.display === 'none') {
+                chatContainer.style.display = 'flex';
+                if (isInitialMessage) {
+                    displayInitialMessage();
+                    isInitialMessage = false;
+                }
+            } else {
+                chatContainer.style.display = 'none';
+            }
+        }
+
+        function displayInitialMessage() {
+            var chatContainer = document.getElementById('responses');
+            var message = document.createElement('div');
+            message.className = 'message ai';
+            message.textContent = "気になったことはお気軽に相談してください。AIチャットボットが回答します！";
+            chatContainer.appendChild(message);
+        }
+
+        function sendMessage() {
+            var input = document.getElementById('userInput').value;
+            if (input.trim() === '') return;
+            var chatContainer = document.getElementById('responses');
+
+            var userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.textContent = input;
+            chatContainer.appendChild(userMessage);
+            
+            document.getElementById('loadingIndicator').style.display = 'block';
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({input: input})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                var message = document.createElement('div');
+                message.className = 'message ai';
+                if (data.response.length > 0 && data.response[0].text) {
+                    message.textContent = data.response[0].text;
+                } else {
+                    message.textContent = "何かエラーが発生しました。";
+                }
+                chatContainer.appendChild(message);
+                document.getElementById('userInput').value = '';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                var errorMessage = document.createElement('div');
+                errorMessage.className = 'message ai';
+                errorMessage.textContent = "エラーが発生しました: " + error;
+                chatContainer.appendChild(errorMessage);
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+
+</html>

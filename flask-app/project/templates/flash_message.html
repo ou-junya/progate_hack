@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Post Successful{% endblock %}
+
+{% block content %}
+<div class="notification is-success">
+    正しく投稿されました。数秒後に投稿一覧にリダイレクトされます。
+</div>
+
+<script>
+    setTimeout(function() {
+        window.location.href = "{{ url_for('main.posted') }}";
+    }, 3000);  // 3秒後にリダイレクト
+</script>
+{% endblock %}

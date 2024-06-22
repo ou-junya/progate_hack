@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .card {
+    background-color: rgba(68, 106, 129, 0.87);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 300px;
+    max-width: 300px;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+  }
+
+  .card-content {
+    color: rgb(225, 233, 190);
+    flex-grow: 1;
+  }
+
+  .content {
+    text-align: left;
+  }
+
+  .card-footer {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    text-align: left;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .card-footer small {
+    display: block;
+  }
+
+  .column {
+    display: flex;
+    justify-content: center;
+  }
+
+  .columns.is-multiline>.column {
+    margin-bottom: 20px;
+  }
+
+  .button.is-primary {
+    width: 100%;
+    color: rgb(26, 47, 59);
+    background-color: rgb(234, 218, 138);
+    border: none;
+    box-shadow: none;
+  }
+
+  .button.is-primary:hover {
+    background-color: rgb(240, 160, 104);
+  }
+
+  .margin {
+    margin-top: 100px;
+  }
+
+  .card-image {
+    padding: 10px; /* 画像周辺の余白を設定 */
+}
+
+  .card-image img {
+    width: calc(100% - 20px); /* パディング分を考慮した幅 */
+    height: auto; /* 高さを自動調整してアスペクト比を維持 */
+    object-fit: cover; /* 画像が枠に収まるように調整 */
+    display: block; /* imgタグがデフォルトで持つ余白を削除 */
+    border-radius: 10px; /* 画像の角も丸く設定 */
+}
+</style>
+<h1 class="margin title">投稿一覧</h1>
+<div class="columns is-multiline">
+  {% for posted_article in posted_articles %}
+  <div class="column is-one-quarter">
+    <div class="card">
+      <div class="card-image">
+        <figure class="image is-4by3">
+          <img src="{{ url_for('static', filename=posted_article.image_path) }}" alt="Thumbnail for {{ posted_article.title }}">
+        </figure>
+      </div>
+      <div class="card-content">
+        <div class="media">
+          <div class="media-content">
+            <p class="title is-4">
+              <a href="{{ url_for('main.edit_post', article_id=posted_article.id) }}">{{ posted_article.title }}</a>
+            </p>
+            <p class="subtitle is-6">{{ posted_article.date }}</p>
+          </div>
+        </div>
+        <div class="content">
+          {{ posted_article.content }}
+          <br>
+          <small>Price: {{ posted_article.price }}円</small>
+        </div>
+      </div>
+      <div class="card-footer">
+        <a href="{{ url_for('main.edit_post', article_id=posted_article.id) }}" class="button is-primary">編集</a>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

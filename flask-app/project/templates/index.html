@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- <h1 class="title">記事一覧</h1> -->
+
+<style>
+  .landing-page {
+    position: relative;
+    display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 100vh;
+    /* background: url('/static/images/sunset_city.jpg'); */
+    background-size: cover;
+    background-position: top center;
+    padding: 0;
+  }
+
+  .pre_content {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .card {
+    background-color: rgba(68, 106, 129, 0.87);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 300px;
+    max-width: 300px;
+  }
+
+  .card:hover {
+    transform: scale(1.05);
+  }
+
+  .card-content {
+    color: rgb(225, 233, 190);
+    flex-grow: 1;
+  }
+
+  .content {
+    text-align: left;
+  }
+
+  .card-footer {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 10px;
+    text-align: left;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .card-footer small {
+    display: block;
+  }
+
+  .column {
+    display: flex;
+    justify-content: center;
+  }
+
+  .columns.is-multiline>.column {
+    margin-bottom: 20px;
+  }
+
+  .button.is-primary {
+    width: 100%;
+    color: rgb(26, 47, 59);
+    background-color: rgb(234, 218, 138);
+    border: none;
+    box-shadow: none;
+  }
+
+  .button.is-primary:hover {
+    background-color: rgb(240, 160, 104);
+  }
+
+  .scroll-indicator {
+    position: absolute;
+    font-size: 3em;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    animation: bounce 2s infinite;
+  }
+
+  @keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateY(0);
+    }
+
+    40% {
+      transform: translateY(-15px);
+    }
+
+    60% {
+      transform: translateY(-7px);
+    }
+  }
+
+  .button.is-editable {
+    background-color: #454cb6;
+    /* Light blue color */
+    color: white;
+    width: 100%;
+    border: none;
+    box-shadow: none;
+  }
+
+  .button.is-editable:hover {
+    background-color: #272b7a;
+    /* Slightly darker light blue on hover */
+  }
+  .card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* オーバーフローする画像をカット */
+  border-radius: 15px; /* カードの角をより丸く */
+}
+
+.card-image {
+  padding: 10px; /* 画像周辺の余白を設定 */
+}
+
+.card-image img {
+  width: calc(100% - 20px); /* パディング分を考慮した幅 */
+  height: auto; /* 高さを自動調整してアスペクト比を維持 */
+  object-fit: cover; /* 画像が枠に収まるように調整 */
+  display: block; /* imgタグがデフォルトで持つ余白を削除 */
+  border-radius: 10px; /* 画像の角も丸く設定 */
+}
+
+
+</style>
+
+<body>
+  <header class="landing-page">
+    <div class="scroll-indicator">
+      ↓
+    </div>
+    <script>
+      document.addEventListener('scroll', function () {
+        const scrollIndicator = document.querySelector('.scroll-indicator');
+        const scrollPosition = window.scrollY;
+        const fadeStart = 0; // フェードアウトが始まるスクロール位置
+        const fadeEnd = 100; // フェードアウトが完了するスクロール位置
+
+        if (scrollPosition > fadeStart) {
+          let opacity = 1 - (scrollPosition - fadeStart) / (fadeEnd - fadeStart);
+          opacity = Math.max(opacity, 0); // 最小値を0に設定
+          scrollIndicator.style.opacity = opacity;
+        } else {
+          scrollIndicator.style.opacity = 1;
+        }
+      });
+    </script>
+  </header>
+  <div class="pre_content">
+  </div>
+  <div class="scroll-content">
+    <div class="columns is-multiline">
+      {% for article in articles %}
+      <div class="column is-one-quarter">
+        <div class="card">
+          <div class="card-image">
+            <figure class="image is-4by3">
+              <img src="{{ url_for('static', filename=article.image_path) }}" alt="Thumbnail for {{ article.title }}">
+            </figure>
+          </div>
+          <div class="card-content">
+            <div class="media">
+              <div class="media-content">
+                <p class="title is-4">
+                  {% if article.user_id == current_user.id %}
+                  <a href="{{ url_for('main.edit_post', article_id=article.id) }}">{{ article.title }}</a>
+                  {% else %}
+                  <a href="{{ url_for('main.article', article_id=article.id) }}">{{ article.title }}</a>
+                  {% endif %}
+                </p>
+                <p class="subtitle is-6">{{ article.date }}</p>
+              </div>
+            </div>
+            <div class="content">
+              {{ article.content }}
+              <br>
+              <small>Price: {{ article.price }}円</small>
+            </div>
+          </div>
+          <div class="card-footer">
+            {% if article.user_id == current_user.id %}
+            <a href="{{ url_for('main.edit_post', article_id=article.id) }}" class="button is-primary">編集</a>
+            {% else %}
+            <form action="{{ url_for('main.checkout', article_id=article.id) }}" method="POST" style="width: 100%;">
+              <button class="button is-primary">購入</button>
+            </form>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% endblock %}
+  </div>
+</body>

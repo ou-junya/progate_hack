@@ -1,0 +1,8 @@
+flask
+Flask-SocketIO
+flask_sqlalchemy
+flask-login
+stripe
+boto3
+pillow
+python-dotenv

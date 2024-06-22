@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+  Welcome, {{ user_info.username }}!
+</h1>
+<div class="content">
+  <p><strong>Email:</strong> {{ user_info.email }}</p>
+  <!-- 他の必要なユーザー情報を追加 -->
+</div>
+<script>
+  setTimeout(function () {
+    window.location.href = "{{ url_for('main.index') }}";
+  }, 3000);  // 3秒後にリダイレクト
+</script>
+{% endblock %}

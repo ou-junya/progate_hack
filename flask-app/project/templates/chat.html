@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    body, html {
+        height: 100%;
+        margin: 0;
+        font-family: 'Roboto', Arial, sans-serif;
+        background-color: #f5f7fa;
+        position: relative;
+    }
+    #chatContainer {
+        width: 350px;
+        height: 80%;
+        position: fixed;
+        top: 60px; /* メニューバーの高さに応じて調整 */
+        right: 30px;
+        border: none;
+        background-color: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        display: none;
+        flex-direction: column;
+        z-index: 1000;
+        overflow: hidden;
+    }
+    #chatHeader {
+        background-color: #4a90e2;
+        color: white;
+        padding: 15px;
+        font-weight: bold;
+        font-size: 18px;
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+    }
+    #responses {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+    .message {
+        padding: 12px 16px;
+        border-radius: 18px;
+        max-width: 80%;
+        line-height: 1.4;
+        font-size: 14px;
+        text-align: left;
+    }
+    .user {
+        align-self: flex-end;
+        background-color: #4a90e2;
+        color: white;
+    }
+    .ai {
+        align-self: flex-start;
+        background-color: #f0f2f5;
+        color: #1c2733;
+    }
+    #inputArea {
+        padding: 15px;
+        border-top: 1px solid #e6e6e6;
+        display: flex;
+        align-items: center;
+    }
+    #userInput {
+        flex-grow: 1;
+        padding: 12px 15px;
+        border: 1px solid #e6e6e6;
+        border-radius: 25px;
+        outline: none;
+        font-size: 14px;
+        margin-right: 10px;
+    }
+    #sendButton {
+        padding: 10px 15px;
+        background-color: #4a90e2;
+        border: none;
+        color: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    #sendButton:hover {
+        background-color: #3a7bc8;
+    }
+    #chatBotButton {
+        position: fixed;
+        right: 30px;
+        bottom: 30px;
+        width: 60px;
+        height: 60px;
+        background-color: #4a90e2;
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 24px;
+        cursor: pointer;
+        z-index: 1001;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+    }
+    #chatBotButton:hover {
+        background-color: #3a7bc8;
+        transform: scale(1.05);
+    }
+    #loadingIndicator {
+        display: none;
+        text-align: center;
+        padding: 20px;
+    }
+    .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #3498db;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<body>
+    <button id="chatBotButton" onclick="toggleChat()">💬</button>
+    <div id="chatContainer">
+        <div id="chatHeader">AIチャットボット</div>
+        <div id="responses"></div>
+        <div id="loadingIndicator">
+            <div class="loader"></div>
+        </div>
+        <div id="inputArea">
+            <input type="text" id="userInput" placeholder="メッセージを入力" onkeypress="handleKeyPress(event)">
+            <button id="sendButton" onclick="sendMessage()">送信</button>
+        </div>
+    </div>
+
+    <script>
+        let isInitialMessage = true;
+
+        function toggleChat() {
+            var chatContainer = document.getElementById('chatContainer');
+            if (chatContainer.style.display === 'none') {
+                chatContainer.style.display = 'flex';
+                if (isInitialMessage) {
+                    displayInitialMessage();
+                    isInitialMessage = false;
+                }
+            } else {
+                chatContainer.style.display = 'none';
+            }
+        }
+
+        function displayInitialMessage() {
+            var chatContainer = document.getElementById('responses');
+            var message = document.createElement('div');
+            message.className = 'message ai';
+            message.textContent = "気になったことはお気軽に相談してください。AIチャットボットが回答します！";
+            chatContainer.appendChild(message);
+        }
+
+        function sendMessage() {
+            var input = document.getElementById('userInput').value;
+            if (input.trim() === '') return;
+            var chatContainer = document.getElementById('responses');
+
+            var userMessage = document.createElement('div');
+            userMessage.className = 'message user';
+            userMessage.textContent = input;
+            chatContainer.appendChild(userMessage);
+            
+            document.getElementById('loadingIndicator').style.display = 'block';
+
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({input: input})
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                var message = document.createElement('div');
+                message.className = 'message ai';
+                if (data.response.length > 0 && data.response[0].text) {
+                    message.textContent = data.response[0].text;
+                } else {
+                    message.textContent = "何かエラーが発生しました。";
+                }
+                chatContainer.appendChild(message);
+                document.getElementById('userInput').value = '';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                document.getElementById('loadingIndicator').style.display = 'none';
+                var errorMessage = document.createElement('div');
+                errorMessage.className = 'message ai';
+                errorMessage.textContent = "エラーが発生しました: " + error;
+                chatContainer.appendChild(errorMessage);
+            });
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+    </script>
+</body>
+{% endblock %}

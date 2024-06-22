@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+  記事一覧
+</h1>
+
+<style>
+    .card {
+      background-color: rgba(255, 255, 255, 0.4);
+      /* さらに透明な白背景 */
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      /* より薄い境界線 */
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      /* 軽い影を追加 */
+      border-radius: 10px;
+      /* 角を丸くする */
+      transition: transform 0.2s;
+      /* ホバー時のアニメーション */
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      /* 親要素の高さに合わせる */
+      min-height: 300px;
+      /* カードの最小高さを設定 */
+    }
+  
+    .card:hover {
+      transform: scale(1.05);
+      /* ホバー時に少し拡大 */
+    }
+  
+    .card-content {
+      color: black;
+      /* カード内の文字色を黒に設定 */
+      flex-grow: 1;
+    }
+  
+    .content {
+      text-align: left;
+      /* コンテンツを左寄せにする */
+    }
+  
+    .card-footer {
+      background-color: rgba(0, 0, 0, 0.05);
+      /* フッターの背景色を薄く設定 */
+      padding: 10px;
+      text-align: left;
+      /* 左寄せにする */
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      /* フッターの上に境界線を追加 */
+    }
+  
+    .card-footer small {
+      display: block;
+      /* 小さな文字をブロック表示にする */
+    }
+  
+    .column {
+      display: flex;
+      justify-content: center;
+      /* カードを中央揃えにする */
+    }
+  
+    .columns.is-multiline>.column {
+      margin-bottom: 20px;
+      /* カラム間の余白を設定 */
+    }
+  
+    /* カードの幅を固定する */
+    .card {
+      width: 100%;
+      max-width: 300px;
+      /* カードの最大幅を設定 */
+    }
+</style>
+<div class="columns is-multiline">
+    {% for article in articles %}
+    <div class="column is-one-quarter">
+      <div class="card">
+        <div class="card-content">
+          <div class="media">
+            <div class="media-content">
+                <p class="title is-4">
+                    <a href="{{ url_for('main.article', article_id=article.id) }}">{{ article.title }}</a>
+                </p>
+              <p class="subtitle is-6">{{ article.date }}</p>
+            </div>
+          </div>
+  
+          <div class="content">
+            {{ article.content }}
+          </div>
+        </div>
+        <div class="card-footer">
+          <small>価格: {{ article.price }}円</small>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

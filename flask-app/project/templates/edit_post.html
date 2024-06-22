@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">編集</h1>
+<form action="{{ url_for('main.edit_post', article_id=article.id) }}" method="POST">
+    <div class="field">
+        <label class="label">タイトル</label>
+        <div class="control">
+            <input class="input" type="text" name="title" value="{{ article.title }}">
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">コンテンツ</label>
+        <div class="control">
+            <textarea class="textarea" name="content">{{ article.content }}</textarea>
+        </div>
+    </div>
+    <div class="field">
+        <label class="label">価格</label>
+        <div class="control">
+            <input class="input" type="number" name="price" value="{{ article.price }}">
+        </div>
+    </div>
+    <div class="field is-grouped">
+        <div class="control">
+            <button class="button is-success" type="submit" name="save">Save Changes</button>
+        </div>
+        <div class="control">
+            <button class="button is-danger" type="submit" name="delete">Delete Post</button>
+        </div>
+    </div>
+</form>
+{% endblock %}

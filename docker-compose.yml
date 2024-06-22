@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  flask-app:
+    build: ./flask-app
+    container_name: 'flask_app'
+    environment:
+      - FLASK_APP=./project
+      - FLASK_DEBUG=1
+    ports:
+      - "80:5000"
+    volumes:
+      - ./flask-app:/flask-app

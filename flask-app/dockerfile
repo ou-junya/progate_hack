@@ -1,0 +1,17 @@
+FROM python:3.9-slim
+
+# RUN mkdir -p /app/src/project
+WORKDIR /flask-app
+
+# RUN mkdir -p app/src
+
+COPY requirements.txt /flask-app/
+
+# 依存関係をインストール
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+COPY . /flask-app/
+
+# コンテナが起動したときに実行するコマンドを設定
+CMD ["flask", "run", "--host=0.0.0.0"]
