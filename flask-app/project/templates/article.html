@@ -1,36 +1,55 @@
 {% extends "base.html" %}
 
-{% block content %}
-<h1 class="title">{{ article.title }}</h1>
-<p class="subtitle">{{ article.date }}</p>
-
-{% if not purchase %}
-<div>
-    <p>この記事を読むには購入が必要です。</p>
-    <form action="{{ url_for('main.checkout', article_id=article.id) }}" method="POST">
-        <button class="button is-primary purchase-button">購入する</button>
-    </form>
-</div>
-{% else %}
-<div class="content">
-    <p>{{ article.content }}</p>
-    <small>価格: {{ article.price }}円</small>
-</div>
-{% endif %}
-{% endblock %}
-
+{% block extra_styles %}
 <style>
+    .article-container {
+        background-color: rgba(68, 106, 129, 0.87); /* 背景色を透明に設定 */
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 800px; /* 記事の最大幅を制限 */
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05); /* ソフトなシャドウを追加 */
+    }
+
     .purchase-button {
-        background-color: #28a745;
-        /* 緑色 */
+        background-color: #28a745; /* 緑色 */
         border: none;
         color: white;
         width: 100%;
+        padding: 10px 0; /* ボタンの縦のパディングを増やす */
         box-shadow: none;
     }
 
     .purchase-button:hover {
-        background-color: #218838;
-        /* ホバー時の濃い緑色 */
+        background-color: #218838; /* ホバー時の濃い緑色 */
+    }
+
+    .article-image {
+        width: 100%; /* 画像の幅をコンテナに合わせて調整 */
+        border-radius: 8px; /* 画像の角を丸くする */
+        margin-bottom: 20px; /* 画像とテキストコンテンツの間に余白を設ける */
     }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="article-container">
+    <h1 class="title">{{ article.title }}</h1>
+    <p class="subtitle">{{ article.date }}</p>
+    <img src="{{ url_for('static', filename=path) }}" alt="Thumbnail for {{ article.title }}" class="article-image">
+
+    {% if not purchase %}
+    <div>
+        <p>この記事を読むには購入が必要です。</p>
+        <form action="{{ url_for('main.checkout', article_id=article.id) }}" method="POST">
+            <button class="button is-primary purchase-button">購入する</button>
+        </form>
+    </div>
+    {% else %}
+    <div class="content">
+        <p>{{ article.content }}</p>
+        <small>価格: {{ article.price }}円</small>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

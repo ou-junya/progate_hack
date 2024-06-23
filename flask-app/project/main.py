@@ -27,7 +27,7 @@ import os
 main = Blueprint("main", __name__)
 
 def translate_title(title):
-    modelId = 'anthropic.claude-3-sonnet-20240229-v1:0'
+    modelId = 'anthropic.claude-3-5-sonnet-20240620-v1:0'
     AWS_KEY = os.getenv("AWS_KEY")
     AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
     bedrock_runtime = boto3.client(service_name='bedrock-runtime', 
@@ -95,7 +95,7 @@ def generate_image(model_id, prompt, path):
 @main.route("/chat", methods=["POST"])
 @login_required
 def chat():
-    modelId = 'anthropic.claude-3-sonnet-20240229-v1:0'
+    modelId = 'anthropic.claude-3-5-sonnet-20240620-v1:0'
     AWS_KEY = os.getenv("AWS_KEY")
     AWS_SECRET_KEY = os.getenv("AWS_SECRET_KEY")
     bedrock_runtime = boto3.client(service_name='bedrock-runtime', 
@@ -229,11 +229,15 @@ def success(article_id):
 @login_required
 def article(article_id):
     article = Article.query.get_or_404(article_id)
+    if not os.path.isfile(f'project/static/images/thumbnail/{article.id}.jpg'):
+        image_path = 'images/logo.png'
+    else:
+        image_path = f'images/thumbnail/{article.id}.jpg'
     purchase = Purchase.query.filter_by(
         user_id=current_user.id, post_id=article_id
     ).first()
     return render_template(
-        "article.html", article=article, purchase=purchase is not None
+        "article.html", article=article, purchase=purchase is not None, path=image_path
     )
 
 

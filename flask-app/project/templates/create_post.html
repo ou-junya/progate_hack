@@ -2,40 +2,78 @@
 
 {% block title %}Create a New Post{% endblock %}
 
+{% block extra_styles %}
+<style>
+    body {
+        background: url('{{ url_for("static", filename="images/background.jpg") }}') no-repeat center center fixed; 
+        background-size: cover;
+    }
+
+    .form-container {
+        background-color: rgba(68, 106, 129, 0.87);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        margin: 30px auto;
+        max-width: 600px;
+    }
+
+    .input, .textarea {
+        border: 2px solid #dbdbdb;
+        transition: border-color .3s ease;
+    }
+
+    .input:focus, .textarea:focus {
+        border-color: #b5b5b5;
+        outline: none;
+    }
+
+    .button.is-light {
+        background-color: #f5f5f5;
+        border-color: #dbdbdb;
+        color: #363636;
+    }
+
+    .button.is-light:hover {
+        background-color: #e2e2e2;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<header class="has-text-centered">
+<div class="form-container has-text-centered">
     <h1 class="title">投稿フォーム</h1>
-</header>
 
-<form action="{{ url_for('main.create_post') }}" method="POST">
-    <div class="field">
-        <label class="label">タイトル(Title)</label>
-        <div class="control">
-            <input class="input" type="text" name="title" placeholder="Enter the title of your post" required>
+    <form action="{{ url_for('main.create_post') }}" method="POST">
+        <div class="field">
+            <label class="label">タイトル(Title)</label>
+            <div class="control">
+                <input class="input" type="text" name="title" placeholder="Enter the title of your post" required>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <label class="label">本文(Content)</label>
-        <div class="control">
-            <textarea class="textarea" name="content" placeholder="Write your content here" rows="10" required></textarea>
+        <div class="field">
+            <label class="label">本文(Content)</label>
+            <div class="control">
+                <textarea class="textarea" name="content" placeholder="Write your content here" rows="10" required></textarea>
+            </div>
         </div>
-    </div>
 
-    <div class="field">
-        <label class="label">価格(Price)</label>
-        <div class="control">
-            <input class="input" type="number" name="price" placeholder="Enter the price" step="0.01" required>
+        <div class="field">
+            <label class="label">価格(Price)</label>
+            <div class="control">
+                <input class="input" type="number" name="price" placeholder="Enter the price" step="0.01" required>
+            </div>
         </div>
-    </div>
 
-    <div class="field is-grouped form-actions">
-        <div class="control">
-            <button class="button is-light is-fullwidth" type="submit">投稿</button>
+        <div class="field is-grouped form-actions">
+            <div class="control">
+                <button class="button is-light is-fullwidth" type="submit">投稿</button>
+            </div>
+            <div class="control">
+                <button class="button is-light is-fullwidth" type="button" onclick="window.location.href='{{ url_for('main.posted') }}';">取消</button>
+            </div>
         </div>
-        <div class="control">
-            <button class="button is-light is-fullwidth" type="button" onclick="window.location.href='{{ url_for('main.posted') }}';">取消</button>
-        </div>
-    </div>
-</form>
+    </form>
+</div>
 {% endblock %}
